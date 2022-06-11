@@ -4,7 +4,7 @@ defined('ABSPATH') or die('No script kiddies please');
 
 /*
   Plugin Name: Simple gust post
-  Description: A plugin to submit and manage WordPress posts from frontend with or without logging in
+  Description: A plugin to submit and manage WordPress posts from frontend with or without logging in by using sort codes
   Version:     1.0.0
   Author:      Jayvin busa
   Author URI:  
