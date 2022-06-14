@@ -33,6 +33,41 @@ class SGP_GuestPostSubmit{
     $this->enable_shortcode();
 	add_action( 'template_redirect', array($this, 'sgp_template_redirection')  );
 
+    //add gust post post type to manage all gust post
+    function add_gust_post_type() {
+
+        //labels array added inside the function and precedes args array
+        
+        $labels = array(
+        'name' => _x( 'Gust Post', 'post type general name' ),
+        'singular_name' => _x( 'Gust Post', 'post type singular name' ),
+        'add_new' => _x( 'Add New', 'Gust Post' ),
+        'add_new_item' => __( 'Add New Gust Post' ),
+        'edit_item' => __( 'Edit Gust Post' ),
+        'new_item' => __( 'New Gust Post' ),
+        'all_items' => __( 'All Gust Posts' ),
+        'view_item' => __( 'View Gust Post' ),
+        'search_items' => __( 'Search Gust Post' ),
+        'not_found' => __( 'No Gust Post found' ),
+        'not_found_in_trash' => __( 'No Gust Post found in the Trash' ),
+        'parent_item_colon' => '',
+        'menu_name' => 'Gust Posts'
+        );
+        
+        // args array
+        
+        $args = array(
+        'labels' => $labels,
+        'description' => 'Displays Gust Post submitted by gust  user',
+        'public' => true,
+        'menu_position' => 4,
+        'supports' => array( 'title', 'editor', 'thumbnail', 'excerpt', 'comments' ),
+        'has_archive' => true,
+        );
+        
+        register_post_type( 'gust_post', $args );
+        }
+
     }
     
     public function sgp_template_redirection( $template ) {	
