@@ -4,7 +4,7 @@ defined('ABSPATH') or die('No script kiddies please');
 
 /*
   Plugin Name: Simple gust post
-  Description: A plugin to submit and manage WordPress posts from frontend with or without logging in by using sort codes
+  Description: A plugin to submit and manage WordPress posts from frontend with or without logging in by using Shortcode
   Version:     1.0.0
   Author:      Jayvin busa
   Author URI:  
@@ -16,6 +16,7 @@ defined('ABSPATH') or die('No script kiddies please');
  */
 
 include dirname( __FILE__ ).'/sgp-functions.php';
+        
 class SGP_GuestPostSubmit{
     
     public function __construct(){
@@ -26,50 +27,16 @@ class SGP_GuestPostSubmit{
 	wp_enqueue_script('tiny_mce', plugins_url('tiny_mce.js',__FILE__));
 	*/
 	if (is_admin()){
+        
 	    add_action( 'admin_menu', array($this, 'sgp_add_settings_menu') );
         add_action( 'admin_init', array($this, 'sgp_init_settings') );
 	}
 	$this->options = get_option( 'sgp_options' );
     $this->enable_shortcode();
 	add_action( 'template_redirect', array($this, 'sgp_template_redirection')  );
-
-    //add gust post post type to manage all gust post
-    function add_gust_post_type() {
-
-        //labels array added inside the function and precedes args array
-        
-        $labels = array(
-        'name' => _x( 'Gust Post', 'post type general name' ),
-        'singular_name' => _x( 'Gust Post', 'post type singular name' ),
-        'add_new' => _x( 'Add New', 'Gust Post' ),
-        'add_new_item' => __( 'Add New Gust Post' ),
-        'edit_item' => __( 'Edit Gust Post' ),
-        'new_item' => __( 'New Gust Post' ),
-        'all_items' => __( 'All Gust Posts' ),
-        'view_item' => __( 'View Gust Post' ),
-        'search_items' => __( 'Search Gust Post' ),
-        'not_found' => __( 'No Gust Post found' ),
-        'not_found_in_trash' => __( 'No Gust Post found in the Trash' ),
-        'parent_item_colon' => '',
-        'menu_name' => 'Gust Posts'
-        );
-        
-        // args array
-        
-        $args = array(
-        'labels' => $labels,
-        'description' => 'Displays Gust Post submitted by gust  user',
-        'public' => true,
-        'menu_position' => 4,
-        'supports' => array( 'title', 'editor', 'thumbnail', 'excerpt', 'comments' ),
-        'has_archive' => true,
-        );
-        
-        register_post_type( 'gust_post', $args );
-        }
-
-    }
+   }
     
+
     public function sgp_template_redirection( $template ) {	
 	if ( !empty( $_POST['sgp_form_submitted'] ) ) {	    
 	    $this->sgp_process_submit_form();
@@ -79,7 +46,7 @@ class SGP_GuestPostSubmit{
     }
     
     public function sgp_add_settings_menu() {
-	//add_options_page( __('SGP Guest Post Submit Options', 'sgp_text_domain'), __('SGP Guest Post Submit', 'sgp_text_domain'), 'administrator', __FILE__, array($this, 'sgp_display_menu_page') );
+	//add_options_page( __('SGP Guest Post Submit Options', 'Gust Posts'), __('SGP Guest Post Submit', 'Gust Posts'), 'administrator', __FILE__, array($this, 'sgp_display_menu_page') );
 	add_options_page( 'SGP Guest Post Submit Options', 'SGP Guest Post Submit', 'administrator', __FILE__, array($this, 'sgp_display_menu_page') );
     }
     
@@ -87,7 +54,7 @@ class SGP_GuestPostSubmit{
 
 	?>
 	<div id="tt-general" class="wrap">
-            <h2><?php _e('SGP Guest Post Submit Options','sgp_text_domain'); ?></h2>
+            <h2><?php _e('SGP Guest Post Submit Options','Gust Posts'); ?></h2>
             <div id="short-code">Shortcode for this plugin: [sgp-submit-post]</div>
             <form name="sgp_options_form_settings_api" method="post" action="options.php">
 		<?php settings_fields( 'sgp_settings' ); ?>
@@ -100,16 +67,17 @@ class SGP_GuestPostSubmit{
     
     public function sgp_init_settings(){
 	    register_setting( 'sgp_settings', 'sgp_options');
-		add_settings_section( 'sgp_general_settings_section', __('General Settings', 'sgp_text_domain'), 'sgp_settings_section' );
-	    
+		add_settings_section( 'sgp_general_settings_section', __('General Settings', 'sgp_text_domain'), array($this, 'sgp_general_setting_section_callback'), 'sgp_settings_section' );
+	
 	/*GENERAL SESGPINGS*/
-        add_settings_field( 'sgp_chk_notifyfield', __('Send Notification via Email', 'sgp_text_domain'), array($this,'sgp_display_check_box'), 'sgp_settings_section', 'sgp_general_settings_section', array('name' => 'sgp_chk_notifyfield' ));
         add_settings_field( 'sgp_txt_contact_email', __('Email for Notification', 'sgp_text_domain'), array($this,'sgp_display_text_field'), 'sgp_settings_section', 'sgp_general_settings_section', array( 'name' => 'sgp_txt_contact_email', 'txt_type' => 'email', 'place_holder' =>'Email Address For Sending Notification', 'size'=>50  ) );
         add_settings_field( 'sgp_txt_confirmation_msg', __('Post Submit Confirmation Message', 'sgp_text_domain'), array($this,'sgp_display_text_field'), 'sgp_settings_section', 'sgp_general_settings_section', array( 'name' => 'sgp_txt_confirmation_msg', 'txt_type' => 'text', 'place_holder' =>'Type Message To Show When Post Submit Successfull', 'size'=>50  ) );
         add_settings_field( 'sgp_txt_failure_msg', __('Post Submit Failure Message', 'sgp_text_domain'), array($this,'sgp_display_text_field'), 'sgp_settings_section', 'sgp_general_settings_section', array( 'name' => 'sgp_txt_failure_msg', 'txt_type' => 'text', 'place_holder' =>'Type Message To Show When Post Submit Fails', 'size'=>50  ) );
-        
-     }
-    
+        }
+        public function sgp_general_setting_section_callback() {
+            echo "<p class='fullv-msg'>Thank You For Using SGP gust post plugin";
+            
+        }
     public function sgp_display_text_field( $data = array() ) {
 	    extract( $data );
 	//$options = get_option( 'sgp_options' ); 
@@ -123,8 +91,9 @@ class SGP_GuestPostSubmit{
         }else{
             //echo "<br />";
         }
-    }
+    
     ?>
+    
     
 	<?php
     }
@@ -173,44 +142,29 @@ class SGP_GuestPostSubmit{
                                 <section id="aligned">';
                                             
 				    
-					$template_str .= '<input  type="text" class="txtinput" id="title" name="title" title= "'.__("Please Enter a Post Title","sgp_text_domain").'" x-moz-errormessage="'.__("Please Enter a Post Title","sgp_text_domain").'" size="72"';
+					$template_str .= '<input  type="text" class="txtinput postfield" id="title" name="title" title= "'.__("Please Enter a Post Title","sgp_text_domain").'" x-moz-errormessage="'.__("Please Enter a Post Title","sgp_text_domain").'" size="72"';
 					$template_str .= ' required="required" ';
 					$template_str .= 'placeholder="'.__("Post Title Here", "sgp_text_domain").'">';// . wp_nonce_field();
-			        $template_str .= '<textarea class="txtblock" name="content" title="'.__("Please Enter Contents", "sgp_text_domain").'" x-moz-errormessage="'.__("Please Enter Contents", "sgp_text_domain").'" rows="15" cols="72" maxlength="'.$this->options['sgp_txt_maxlength'].'"';
+			        $template_str .= '<textarea class="txtblock postfield" name="content" title="'.__("Please Enter Contents", "sgp_text_domain").'" x-moz-errormessage="'.__("Please Enter Contents", "sgp_text_domain").'" rows="10" cols="72" ';
 					$template_str .= ' required="required" ';
-					$template_str .= 'placeholder="'.__("Write Your Post Contents", "sgp_text_domain").'"></textarea>';
-					
-				    }
-				       
-					$args = array(
-						'orderby' => 'name',
-						'order' => 'ASC'
-						);
-					$categories = get_categories($args);
-					$template_str .= '<select name="catdrp" class="postform" id="catdrp" ';
-					$template_str .= (isset($this->options['sgp_chk_categoryfield_req']) && $this->options['sgp_chk_categoryfield_req']=="on") ? ' required="required" ' : ' ';
-					$template_str .= '> <option value="">'.__("Select a Category", "sgp_text_domain").'</option>';
-					foreach($categories as $category) { 
-					    $template_str .= '<option value="' . $category->cat_ID . '">'.$category->name.'</option>';
-					}
-					$template_str .= '</select>';
-				    
-				                    
-		 
-				   $template_str .= '<p id="fi-title">'. __("Upload Featured Image and Additional Images","sgp_text_domain") . '</p>
-							    <div class="featured-img">
+					$template_str .= 'placeholder="'.__("Write Your Post Contents", "Gust Posts").'"></textarea>';
+					$template_str .= '<textarea class="ecpery postfield" name="excerpt" title="'.__("Please Enter Expert", "sgp_text_domain").'" x-moz-errormessage="'.__("Please Enter Expert", "sgp_text_domain").'" rows="5" cols="72" ';
+					$template_str .= ' required="required" ';
+					$template_str .= 'placeholder="'.__("Write Your Post Expert", "Gust Posts").'"></textarea>';
+					$template_str .= '<p id="fi-title">'. __("Upload Featured Image and Additional Images","Gust Posts") . '</p>
+							    <div class="featured-img postfield">
 								<input name="featured-img[]" type="file" id="featured-img"';
 								$template_str .= ' required="required" ';
 								$template_str .= ' multiple="multiple"><br>
 							    </div>';
 				    
-				        $template_str .= '<input type="hidden" value="'. $author .'" name="authorid">
+				    $template_str .= '<input type="hidden" value="'. $author .'" name="authorid">
 							  <input type="hidden" value="'. $redirect_url .'" name="redirect_url">
 							  <input type="hidden" value="'. $this->options["sgp_drp_status"] .'" name="post_status">
 							  
 							  <input type="hidden" value="';
-							  $template_str .= isset($this->options["sgp_chk_notifyfield"])?$this->options["sgp_chk_notifyfield"]:"";
-							  $template_str .= '" name="notify_flag">
+				    $template_str .= isset($this->options["sgp_chk_notifyfield"])?$this->options["sgp_chk_notifyfield"]:"";
+				    $template_str .= '" name="notify_flag">
 							  
 	
 							  
@@ -218,14 +172,14 @@ class SGP_GuestPostSubmit{
 							  <input type="hidden" name="sgp_form_submitted" value="1" />' . 
                                 '</section>
                                 <section id="buttons">
-                                        <input type="reset" name="reset" id="resetbtn" class="resetbtn" value="'.__("Reset", "sgp_text_domain").'">
-                                        <input type="submit" name="submit" id="submitbtn" class="submitbtn" tabindex="7" value="'.__("Submit Post", "sgp_text_domain").'">
+                                        <input type="reset" name="reset" id="resetbtn" class="resetbtn" value="'.__("Reset", "Gust Posts").'">
+                                        <input type="submit" name="submit" id="submitbtn" class="submitbtn" tabindex="7" value="'.__("Submit Post", "Gust Posts").'">
                                         <br style="clear:both;">
                                 </section>
                             </div>
                         </form>';
          return $template_str; 
-    
+}
     
     public function check_and_set_value($val){
 	if(isset($this->options[$val])){
@@ -233,7 +187,7 @@ class SGP_GuestPostSubmit{
 	}else{
 	    return "";
 	}
-	
+}
     
     
     public function sgp_process_submit_form(){
@@ -241,7 +195,47 @@ class SGP_GuestPostSubmit{
     } // End of function
 
 } // End of Class
+add_action( 'init', 'sgp_plugin_init' );
+function sgp_plugin_init() {
+	$sgpsObj = new SGP_GuestPostSubmit();
+	
+}
 
+//Add gust post post type
+add_action( 'init', 'add_gust_post_type');
 
+    //add gust post post type to manage all gust post
+    function add_gust_post_type() {
+        //labels array added inside the function and precedes args array
+        
+        $labels = array(
+        'name' => _x( 'Gust Post', 'post type general name' ),
+        'singular_name' => _x( 'Gust Post', 'post type singular name' ),
+        'add_new' => _x( 'Add New', 'Gust Post' ),
+        'add_new_item' => __( 'Add New Gust Post' ),
+        'edit_item' => __( 'Edit Gust Post' ),
+        'new_item' => __( 'New Gust Post' ),
+        'all_items' => __( 'All Gust Posts' ),
+        'view_item' => __( 'View Gust Post' ),
+        'search_items' => __( 'Search Gust Post' ),
+        'not_found' => __( 'No Gust Post found' ),
+        'not_found_in_trash' => __( 'No Gust Post found in the Trash' ),
+        'parent_item_colon' => '',
+        'menu_name' => 'Gust Posts'
+        );
+        
+        // args array
+        
+        $args = array(
+        'labels' => $labels,
+        'description' => 'Displays Gust Post submitted by gust user',
+        'public' => true,
+        'menu_position' => 4,
+        'supports' => array( 'title', 'editor', 'thumbnail', 'excerpt', 'comments' ),
+        'has_archive' => true,
+        );
+        
+        register_post_type( 'gust_post', $args );
+        }
 
 ?>
