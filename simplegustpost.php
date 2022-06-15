@@ -19,21 +19,16 @@ include dirname( __FILE__ ).'/sgp-functions.php';
         
 class SGP_GuestPostSubmit{
     
-    public function __construct(){
-        wp_enqueue_style('sgp-style', plugins_url('sgp-style.css',__FILE__));
-
-	/*
-	wp_enqueue_script('tinymce_min', includes_url('js/tinymce/tinymce.min.js',__FILE__));
-	wp_enqueue_script('tiny_mce', plugins_url('tiny_mce.js',__FILE__));
-	*/
-if (is_admin()){
-    add_action( 'admin_menu', array($this, 'sgp_add_settings_menu') );
-    add_action( 'admin_init', array($this, 'sgp_init_settings') );
-	}
-	$this->options = get_option( 'sgp_options' );
-    $this->enable_shortcode();
-	//add_action( 'template_redirect', array($this, 'sgp_template_redirection')  );
-   }
+public function __construct(){
+    wp_enqueue_style('sgp-style', plugins_url('sgp-style.css',__FILE__));
+    if (is_admin()){
+        add_action( 'admin_menu', array($this, 'sgp_add_settings_menu') );
+        add_action( 'admin_init', array($this, 'sgp_init_settings') );
+        }
+        $this->options = get_option( 'sgp_options' );
+        $this->enable_shortcode();
+        //add_action( 'template_redirect', array($this, 'sgp_template_redirection')  );
+    }
     
 // public function sgp_template_redirection( $template ) {	
 // 	if ( !empty( $_POST['sgp_form_submitted'] ) ) {	    
@@ -89,18 +84,13 @@ public function sgp_display_text_field( $data = array() ) {
         }else{
             //echo "<br />";
         }
-    
-    ?>
-    
-    
-	<?php
     }
     
-    public function enable_shortcode(){
+public function enable_shortcode(){
         add_shortcode('sgp-submit-post', array($this, 'sgp_guest_submit_post_shortcode') );
     }
     
-    public function sgp_guest_submit_post_shortcode($atts){
+public function sgp_guest_submit_post_shortcode($atts){
 	
 	$user = get_user_by('login', $this->options['sgp_drp_account']);
 	extract(shortcode_atts(array(
