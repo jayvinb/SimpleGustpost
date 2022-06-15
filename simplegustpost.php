@@ -53,6 +53,8 @@ public function sgp_display_menu_page(){
 	<div id="tt-general" class="wrap">
             <h2><?php _e('SGP Guest Post Submit Options','Gust Posts'); ?></h2>
             <div id="short-code">Shortcode for this plugin: [sgp-submit-post]</div>
+            <div id="short-code">Shortcode for list pading post: [sgp_gust_posts-list]</div>
+            
             <form name="sgp_options_form_settings_api" method="post" action="options.php">
 		<?php settings_fields( 'sgp_settings' ); ?>
 		<?php do_settings_sections( 'sgp_settings_section' ); ?> 
@@ -265,6 +267,76 @@ function add_gust_post_type() {
         
 //Add javascript in wordpress footer 
 add_action('wp_footer', 'footer_ajax_script'); 
+
+// >> Create Shortcode to Display Movies Post Types
+  
+function sgp_create_shortcode_gust_posts_post_type(){
+    if ( current_user_can( 'manage_options' ) )
+  {
+    $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+    $args = array(
+                    'post_type'      => 'gust_post',
+                    'posts_per_page' => '10',
+                    'post_status' => 'pending',
+                    'paged' => $paged,
+                    
+                 );
+  
+    $query = new WP_Query($args);
+  
+    if($query->have_posts()) :
+        $result .= '<table class="gust_post-item"><tr><th>Post imge</th><th>Post title</th><th>Post status</th></tr>';
+        while($query->have_posts()) :
+  
+            $query->the_post() ;
+                      
+        
+        $result .= '<tr>';
+        $result .= '<td class="gust_post-poster">' . get_the_post_thumbnail() . '</td>';
+        $result .= '<td class="gust_post-name">'. get_the_title() .'</td>';
+        
+        $result .= '<td class="gust_post-name">'.get_post_status(). '</td>';
+        
+
+        $result .= ''; 
+        $result .= '</tr>';
+  
+        endwhile;
+
+        
+        $total_pages = $query->max_num_pages;
+
+    if ($total_pages > 1){
+
+        $current_page = max(1, get_query_var('paged'));
+        $result .= '<tr class="paged"><td>';
+  
+        $result .= paginate_links(array(
+            'base' => get_pagenum_link(1) . '%_%',
+            'format' => '/page/%#%',
+            'current' => $current_page,
+            'total' => $total_pages,
+            'prev_text'    => __('« prev'),
+            'next_text'    => __('next »'),
+        ));
+        $result .= '</td></tr>';
+  
+    }
+        wp_reset_postdata();
+  
+    endif;    
+  
+    return $result;            
+}
+else
+{
+    echo 'you have not access to view';
+}
+}
+  
+add_shortcode( 'sgp_gust_posts-list', 'sgp_create_shortcode_gust_posts_post_type' ); 
+  
+// shortcode code ends here
         
         ?>
 
